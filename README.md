@@ -85,6 +85,13 @@ With [pipx](https://github.com/pipxproject/pipx)
 
 `pipx install git+https://github.com/MatthieuBizien/roam-to-git.git`
 
+## Run directly from the repo
+Install the required dependencies with `pip install -r requirements.txt`. After
+that you can generate the files by running a local copy of roam-to-git like
+that:
+
+`PYTHONPATH=.:$PYTHONPATH python roam_to_git/__main__.py ../notes --skip-fetch --skip-git`
+
 ## Create a (private) Github repository for all your notes
 
 With [gh](https://github.com/cli/cli): `gh repo create notes` (yes, it's private)

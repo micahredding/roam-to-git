@@ -10,9 +10,9 @@ import git
 from dotenv import load_dotenv
 from loguru import logger
 
-from roam_to_git.formatter import read_markdown_directory, format_markdown
+from roam_to_git.formatter import read_markdown_directory, format_markdown, format_markdown_notes
 from roam_to_git.fs import reset_git_directory, unzip_markdown_archive, \
-    unzip_and_save_json_archive, commit_git_directory, push_git_repository, save_markdowns
+    unzip_and_save_json_archive, commit_git_directory, push_git_repository, save_markdowns, save_markdown_notes
 from roam_to_git.scrapping import patch_pyppeteer, scrap, Config
 
 
@@ -84,6 +84,8 @@ def main():
 
     formatted = format_markdown(read_markdown_directory(git_path / "markdown"))
     save_markdowns(git_path / "formatted", formatted)
+    formatted_notes = format_markdown_notes(read_markdown_directory(git_path / "markdown"))
+    save_markdown_notes(git_path / "_notes", formatted_notes)
 
     if repo is not None:
         commit_git_directory(repo)
