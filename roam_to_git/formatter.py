@@ -53,22 +53,36 @@ def format_markdown(contents: Dict[str, str]) -> Dict[str, str]:
     return out
 
 
-def format_markdown_notes(contents: Dict[str, str]) -> Dict[str, str]:
+def get_allowed_notes(dir: Path) -> List[str]:
+    allowed_notes = []
+    if (dir/"Public.md").exists():
+        with open(dir/"Public.md") as f:
+            for line in f:
+                match = re.match(r'- \[\[(.*)\]\]', line)
+                if match:
+                    note_title = match.group(1)
+                    allowed_notes.append(note_title)
+
+    return allowed_notes
+
+
+def format_markdown_notes(contents: Dict[str, str], notes_dir: Path, allowed_notes: List[str]) -> Dict[str, str]:
     back_links = get_back_links(contents)
     # Format and write the markdown files
     out = {}
     for file_name, content in contents.items():
-        # We add the backlinks first, because they use the position of the caracters
-        # of the regex matchs
-        content = add_back_links_notes(content, file_name, back_links[file_name])
+        if file_name[:-3] in allowed_notes:
+            # We add the backlinks first, because they use the position of the caracters
+            # of the regex matchs
+            content = add_back_links_notes(content, notes_dir, file_name, back_links[file_name])
 
-        # Format content. Backlinks content will be formatted automatically.
-        content = format_to_do(content)
-        link_prefix = "../" * sum("/" in char for char in file_name)
-        content = format_link(content, link_prefix=link_prefix)
-        content = convert_links(content)
-        if len(content) > 0:
-            out[file_name] = content
+            # Format content. Backlinks content will be formatted automatically.
+            content = format_to_do(content)
+            link_prefix = "../" * sum("/" in char for char in file_name)
+            content = format_link(content, link_prefix=link_prefix)
+            content = convert_links(content)
+            if len(content) > 0:
+                out[file_name] = content
 
     return out
 
@@ -119,7 +133,7 @@ def add_back_links(content: str, back_links: List[Tuple[str, Match]]) -> str:
     return f"{content}\n# Backlinks\n{backlinks_str}\n"
 
 
-def add_back_links_notes(content: str, file_name: str, back_links: List[Tuple[str, Match]]) -> str:
+def add_back_links_notes(content: str, notes_dir: Path, file_name: str, back_links: List[Tuple[str, Match]]) -> str:
     if not back_links:
         return content
     files = sorted(set((file_name[:-3], match) for file_name, match in back_links),
@@ -139,7 +153,7 @@ def add_back_links_notes(content: str, file_name: str, back_links: List[Tuple[st
 
         context = (start_context + middle_context + end_context).strip()
         extended_context = []
-        with open(f"../notes/markdown/{file}.md") as input:
+        with open(notes_dir/f"{file}.md") as input:
             appending = None
             for line in input:
                 if line.startswith(context) and '-' in line:

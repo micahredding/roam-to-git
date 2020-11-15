@@ -9,6 +9,7 @@ from typing import Dict, List
 import git
 import pathvalidate
 from loguru import logger
+from hashlib import sha1
 
 
 def get_zip_path(zip_dir_path: Path) -> Path:
@@ -75,9 +76,11 @@ def save_markdown_notes(directory: Path, contents: Dict[str, str]):
 
 
 def note_filename(filename: str):
+    file_hash = sha1(filename.encode('utf-8')).hexdigest()[:6]
     filename = filename.lower()
     filename = re.sub(r" ", r"-", filename)
     filename = re.sub(r"[*#?]", r"-", filename)
+    filename = f"{filename[:-3]}-{file_hash}.md"
     return filename
 
 
