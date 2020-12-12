@@ -34,6 +34,9 @@ def get_back_links(contents: Dict[str, str]) -> Dict[str, List[Tuple[str, Match]
     return back_links
 
 
+def fix_triple_backticks(content: str) -> str:
+    return re.sub(r'- ```', r'\n```', content)
+
 def format_markdown(contents: Dict[str, str]) -> Dict[str, str]:
     back_links = get_back_links(contents)
     # Format and write the markdown files
@@ -167,6 +170,7 @@ def add_back_links_notes(content: str, notes_dir: Path, file_name: str, back_lin
                         extended_context.append(line)
         new_lines.extend(["".join(extended_context), ""])
     backlinks_str = "\n".join(new_lines)
+    content = fix_triple_backticks(content)
     return f"---\ntitle: {file_name[:-3]}\n---\n\n{content}\n{backlinks_str}\n"
 
 
