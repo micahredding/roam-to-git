@@ -115,7 +115,7 @@ async def _download_rr_archive(
 
     logger.debug("Wait for interface to load")
     dot_button = None
-    for _ in range(100):
+    for _ in range(333):
         # Starting is a little bit slow, so we wait for the button that signal it's ok
         await asyncio.sleep(config.sleep_duration)
         dot_button = await document.querySelector(".bp3-icon-more")
