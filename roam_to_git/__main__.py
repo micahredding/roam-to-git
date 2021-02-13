@@ -10,34 +10,67 @@ import git
 from dotenv import load_dotenv
 from loguru import logger
 
-from roam_to_git.formatter import read_markdown_directory, format_markdown, format_markdown_notes, get_allowed_notes
-from roam_to_git.fs import reset_git_directory, unzip_markdown_archive, \
-    unzip_and_save_json_archive, commit_git_directory, push_git_repository, save_markdowns, save_markdown_notes
+from roam_to_git.formatter import (
+    read_markdown_directory,
+    format_markdown,
+    format_markdown_notes,
+    get_allowed_notes,
+)
+from roam_to_git.fs import (
+    reset_git_directory,
+    unzip_markdown_archive,
+    unzip_and_save_json_archive,
+    commit_git_directory,
+    push_git_repository,
+    save_markdowns,
+    save_markdown_notes,
+)
 from roam_to_git.scrapping import patch_pyppeteer, scrap, Config
 
 
 @logger.catch(reraise=True)
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("directory", default=None, nargs="?",
-                        help="Directory of your notes are stored. Default to notes/")
-    parser.add_argument("--debug", action="store_true",
-                        help="Help debug by opening the browser in the foreground. Note that the "
-                             "git repository will not be updated with that option.")
-    parser.add_argument("--database", default=None,
-                        help="If you have multiple Roam databases, select the one you want to save."
-                             "Can also be configured with env variable ROAMRESEARCH_DATABASE.")
-    parser.add_argument("--skip-git", action="store_true",
-                        help="Consider the repository as just a directory, and don't do any "
-                             "git-related action.")
-    parser.add_argument("--skip-push", action="store_true",
-                        help="Don't git push after commit.")
-    parser.add_argument("--skip-fetch", action="store_true",
-                        help="Do not download the data from Roam, just update the formatting.")
-    parser.add_argument("--sleep-duration", type=float, default=2.,
-                        help="Duration to wait for the interface. We wait 100x that duration for"
-                             "Roam to load. Increase it if Roam servers are slow, but be careful"
-                             "with the free tier of Github Actions.")
+    parser.add_argument(
+        "directory",
+        default=None,
+        nargs="?",
+        help="Directory of your notes are stored. Default to notes/",
+    )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Help debug by opening the browser in the foreground. Note that the "
+        "git repository will not be updated with that option.",
+    )
+    parser.add_argument(
+        "--database",
+        default=None,
+        help="If you have multiple Roam databases, select the one you want to save."
+        "Can also be configured with env variable ROAMRESEARCH_DATABASE.",
+    )
+    parser.add_argument(
+        "--skip-git",
+        action="store_true",
+        help="Consider the repository as just a directory, and don't do any "
+        "git-related action.",
+    )
+    parser.add_argument(
+        "--skip-push", action="store_true", help="Don't git push after commit."
+    )
+    parser.add_argument(
+        "--skip-fetch",
+        action="store_true",
+        help="Do not download the data from Roam, just update the formatting.",
+    )
+    parser.add_argument(
+        "--sleep-duration",
+        type=float,
+        default=2.0,
+        help="Duration to wait for the interface. We wait 100x that duration for"
+        "Roam to load. Increase it if Roam servers are slow, but be careful"
+        "with the free tier of Github Actions.",
+    )
     args = parser.parse_args()
 
     patch_pyppeteer()
@@ -51,11 +84,20 @@ def main():
         load_dotenv(git_path / ".env", override=True)
     else:
         logger.debug("No secret found at {}", git_path / ".env")
-    if "ROAMRESEARCH_USER" not in os.environ or "ROAMRESEARCH_PASSWORD" not in os.environ:
-        logger.error("Please define ROAMRESEARCH_USER and ROAMRESEARCH_PASSWORD, "
-                     "in the .env file of your notes repository, or in environment variables")
+    if (
+        "ROAMRESEARCH_USER" not in os.environ
+        or "ROAMRESEARCH_PASSWORD" not in os.environ
+    ):
+        logger.error(
+            "Please define ROAMRESEARCH_USER and ROAMRESEARCH_PASSWORD, "
+            "in the .env file of your notes repository, or in environment variables"
+        )
         sys.exit(1)
-    config = Config(args.database, debug=args.debug, sleep_duration=float(args.sleep_duration))
+    config = Config(
+        args.database,
+        debug=args.debug,
+        sleep_duration=float(args.sleep_duration),
+    )
 
     if args.skip_git:
         repo = None
@@ -86,7 +128,11 @@ def main():
     formatted = format_markdown(read_markdown_directory(git_path / "markdown"))
     save_markdowns(git_path / "formatted", formatted)
     allowed_notes = get_allowed_notes(git_path / "markdown")
-    formatted_notes = format_markdown_notes(read_markdown_directory(git_path / "markdown"), git_path / "markdown", allowed_notes)
+    formatted_notes = format_markdown_notes(
+        read_markdown_directory(git_path / "markdown"),
+        git_path / "markdown",
+        allowed_notes,
+    )
     save_markdown_notes(git_path / "_notes", formatted_notes)
 
     if repo is not None:

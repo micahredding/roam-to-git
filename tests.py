@@ -76,6 +76,7 @@ def _extract_links(string) -> List[str]:
 
 class TestExtractLinks(unittest.TestCase):
     """Test that we correctly extract the links, for backreference"""
+
     def test_empty(self):
         self.assertEqual(_extract_links(""), [])
 
