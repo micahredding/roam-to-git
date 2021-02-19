@@ -78,13 +78,15 @@ def format_markdown(contents: Dict[str, str]) -> Dict[str, str]:
 
 def get_allowed_notes(dir: Path) -> List[str]:
     allowed_notes = []
-    if (dir / "Public.md").exists():
-        with open(dir / "Public.md") as f:
-            for line in f:
-                match = re.match(r"- \[\[(.*)\]\]", line)
-                if match:
-                    note_title = match.group(1)
-                    allowed_notes.append(note_title)
+    dirs_to_check = [dir] + [Path(f.path) for f in os.scandir(dir) if f.is_dir()]
+    for dir in dirs_to_check:
+        if (dir / "Public.md").exists():
+            with open(dir / "Public.md") as f:
+                for line in f:
+                    match = re.match(r"- \[\[(.*)\]\]", line)
+                    if match:
+                        note_title = match.group(1)
+                        allowed_notes.append(note_title)
 
     return allowed_notes
 
