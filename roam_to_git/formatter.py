@@ -112,21 +112,22 @@ def format_markdown_notes(
     # Format and write the markdown files
     out = {}
     for file_name, content in contents.items():
-        if file_name[:-3] in allowed_notes:
-            # We add the backlinks first, because they use the position of the caracters
-            # of the regex matchs
-            content = add_back_links_notes(
-                content, notes_dir, file_name, back_links[file_name]
-            )
+        for file_name in (file_name, os.path.basename(file_name)):
+            if file_name[:-3] in allowed_notes:
+                # We add the backlinks first, because they use the position of the caracters
+                # of the regex matchs
+                content = add_back_links_notes(
+                    content, notes_dir, file_name, back_links[file_name]
+                )
 
-            # Format content. Backlinks content will be formatted automatically.
-            content = format_to_do(content)
-            content = process_hyperlinks(content)
-            link_prefix = "../" * sum("/" in char for char in file_name)
-            content = format_link(content, link_prefix=link_prefix)
-            content = convert_links(content)
-            if len(content) > 0:
-                out[file_name] = content
+                # Format content. Backlinks content will be formatted automatically.
+                content = format_to_do(content)
+                content = process_hyperlinks(content)
+                link_prefix = "../" * sum("/" in char for char in file_name)
+                content = format_link(content, link_prefix=link_prefix)
+                content = convert_links(content)
+                if len(content) > 0:
+                    out[file_name] = content
 
     return out
 
