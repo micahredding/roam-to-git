@@ -19,7 +19,7 @@ on:
     branches:
       - master
   schedule:
-    -   cron: "0 0,4,8,12,16,20 * * *"
+    -   cron: "0 */4 * * *"
 
 jobs:
   backup:
@@ -45,15 +45,16 @@ jobs:
           git clone -q https://github.com/everruler12/roam2github.git roam2github
           cd $_
           npm i
-          npm run start -s
+          npm run backup -s
         env:
-          R2G_EMAIL: ${{ secrets.ROAMRESEARCH_USER }}
-          R2G_PASSWORD: ${{ secrets.ROAMRESEARCH_PASSWORD }}
-          R2G_GRAPH: ${{ secrets.ROAMRESEARCH_DATABASE }}
+          ROAM_EMAIL: ${{ secrets.ROAMRESEARCH_USER }}
+          ROAM_PASSWORD: ${{ secrets.ROAMRESEARCH_PASSWORD }}
+          ROAM_GRAPH: ${{ secrets.ROAMRESEARCH_DATABASE }}
 
       - name: Setup dependencies
         run: |
           pip install git+https://github.com/DoomHammer/roam-to-git.git@roam-to-garden
+
       - name: Generate notes
         run: roam-to-git --skip-fetch --skip-git .
         env:
