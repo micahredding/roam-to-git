@@ -86,6 +86,7 @@ def note_filename(filename: str):
     filename = filename.lower()
     filename = re.sub(r" ", r"-", filename)
     filename = re.sub(r"[*#?']", r"-", filename)
+    filename = re.sub(r"[,😊⭐➕📝🔥]", r"", filename)
     filename = f"{filename[:-3]}-{file_hash}.md"
     return filename
 
