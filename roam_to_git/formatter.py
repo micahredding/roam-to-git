@@ -116,9 +116,10 @@ def format_markdown_notes(
             if file_name[:-3] in allowed_notes:
                 # We add the backlinks first, because they use the position of the caracters
                 # of the regex matchs
-                content = add_back_links_notes(
-                    content, notes_dir, file_name, back_links[file_name]
-                )
+                if "SKIP_BACKLINK_NOTES" not in os.environ:
+                    content = add_back_links_notes(
+                        content, notes_dir, file_name, back_links[file_name]
+                    )
 
                 # Format content. Backlinks content will be formatted automatically.
                 content = format_to_do(content)
