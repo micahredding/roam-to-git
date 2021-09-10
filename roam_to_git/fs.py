@@ -87,7 +87,8 @@ def note_filename(filename: str):
     filename = re.sub(r" ", r"-", filename)
     filename = re.sub(r"[*#?']", r"-", filename)
     filename = pathvalidate.sanitize_filename(filename, platform=platform.system())
-    filename = f"{filename[:-3]}-{file_hash}.md"
+    # filename = f"{filename[:-3]}-{file_hash}.md"
+    filename = f"{filename[:-3]}.md"
     return filename
 
 
